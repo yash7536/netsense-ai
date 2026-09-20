@@ -55,7 +55,7 @@ export default function Overview() {
               <br className="hidden sm:inline" /> attention.
             </h1>
             <p className="type-body-lg text-on-surface-variant mt-6 max-w-2xl">
-              Real-time telemetry and predictive drift detection across core transit corridors.
+              Telemetry-driven drift detection across core transit corridors.
             </p>
           </div>
           <div className="lg:col-span-5 grid grid-cols-2 gap-x-10 gap-y-12 pt-2 lg:pt-0">
@@ -192,7 +192,7 @@ export default function Overview() {
                       <div className="flex items-center gap-4 mt-3 type-telemetry-sm text-outline">
                         <span>Forecast: {sig.faultDetail}</span>
                         <span>·</span>
-                        <span>Assigned: {engineer ? engineer.name : "NetSense Model Agent"}</span>
+                        <span>Assigned: {engineer ? engineer.name : "Unassigned"}</span>
                       </div>
                     </div>
                     <div className="text-right shrink-0 pl-4">

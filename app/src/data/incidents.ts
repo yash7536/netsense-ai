@@ -56,7 +56,7 @@ export const INCIDENTS: Incident[] = [
       },
       {
         time: "04:12 UTC",
-        label: "Model PRD-104 Flagged Latency Drift",
+        label: "Prediction PRD-104 Flagged Latency Drift",
         body: "Pre-incident telemetry detected subtle RTT jitter climb from 37.5ms toward 40.2ms with confidence metric of 91%. Advance notice published 76 minutes prior to SLA breach.",
         tag: "CONF: 0.914",
         kind: "predicted",
@@ -114,7 +114,7 @@ export const INCIDENTS: Incident[] = [
       },
       {
         time: "01:40 UTC",
-        label: "Model PRD-102 Flagged Saturation Trend",
+        label: "Prediction PRD-102 Flagged Saturation Trend",
         body: "Bandwidth utilisation trend on Backbone Primary Loop A projected to cross 90% within 9 hours, with 87% confidence.",
         tag: "CONF: 0.870",
         kind: "predicted",
@@ -172,7 +172,7 @@ export const INCIDENTS: Incident[] = [
       },
       {
         time: "02:50 UTC",
-        label: "Model PRD-100 Flagged Health Degradation",
+        label: "Prediction PRD-100 Flagged Health Degradation",
         body: "Link health score trend on Central Optical Highway projected to cross the attention threshold within 7 hours, with 83% confidence.",
         tag: "CONF: 0.830",
         kind: "predicted",
@@ -229,7 +229,7 @@ export const INCIDENTS: Incident[] = [
       },
       {
         time: "Yesterday 08:05 UTC",
-        label: "Model PRD-099 Flagged Oscillation",
+        label: "Prediction PRD-099 Flagged Oscillation",
         body: "Periodic latency oscillation detected on Southern Transit Ring 01 with 81% confidence, correlated to amplifier gain telemetry.",
         tag: "CONF: 0.810",
         kind: "predicted",
@@ -287,7 +287,7 @@ export const INCIDENTS: Incident[] = [
       },
       {
         time: "Yesterday 12:30 UTC",
-        label: "Model PRD-103 Flagged Loss Degradation",
+        label: "Prediction PRD-103 Flagged Loss Degradation",
         body: "Packet loss degradation on Direct Fib 04 flagged with 94% confidence ahead of the scheduled replication window.",
         tag: "CONF: 0.940",
         kind: "predicted",
@@ -345,7 +345,7 @@ export const INCIDENTS: Incident[] = [
       },
       {
         time: "2 days ago 06:15 UTC",
-        label: "Model PRD-101 Flagged Jitter Burst",
+        label: "Prediction PRD-101 Flagged Jitter Burst",
         body: "Jitter burst variance flagged on Intercity Ring C with 78% confidence, correlated to scheduled maintenance traffic.",
         tag: "CONF: 0.780",
         kind: "predicted",

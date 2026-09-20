@@ -47,11 +47,11 @@ export interface NetworkLink {
   };
   physicalLayerNote: string;
   bufferDynamicsNote: string;
-  modelInferenceNote: string;
+  signalNote: string;
   deviceChassis: string;
   ingressInterface: string;
-  samplingRate: string;
-  modelEngine: string;
+  samplingInterval: string;
+  detectionMethod: string;
 }
 
 export type Severity = "critical" | "high" | "medium" | "low";

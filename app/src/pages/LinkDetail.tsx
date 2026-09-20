@@ -93,9 +93,9 @@ export default function LinkDetail() {
             <div className="flex flex-wrap items-center gap-6 type-telemetry-code shrink-0">
               <MetaItem label="Circuit" value={link.circuitId} />
               <div className="h-8 w-px bg-outline-variant/60" />
-              <MetaItem label="Sampling Rate" value={link.samplingRate} />
+              <MetaItem label="Sampling Interval" value={link.samplingInterval} />
               <div className="h-8 w-px bg-outline-variant/60" />
-              <MetaItem label="Model Engine" value={link.modelEngine} />
+              <MetaItem label="Detection" value={link.detectionMethod} />
             </div>
           </div>
         </div>
@@ -106,8 +106,8 @@ export default function LinkDetail() {
         <div className="py-2">
           <div className="flex items-baseline justify-between mb-8 pb-3 border-b border-outline-variant/60">
             <div className="flex items-baseline gap-3">
-              <span className="type-caption uppercase tracking-wider text-primary font-medium">Live Operational State</span>
-              <span className="type-telemetry-code text-outline">Synced 4s ago via gRPC streaming</span>
+              <span className="type-caption uppercase tracking-wider text-primary font-medium">Current Operational State</span>
+              <span className="type-telemetry-code text-outline">Synthetic demo telemetry</span>
             </div>
             <span className="type-telemetry-code text-outline uppercase">Segment Telemetry Feed</span>
           </div>
@@ -226,8 +226,8 @@ export default function LinkDetail() {
             <p className="leading-relaxed">{link.bufferDynamicsNote}</p>
           </div>
           <div className="md:border-l md:border-outline-variant/60 md:pl-8">
-            <span className="type-caption uppercase tracking-wider text-outline block mb-1.5">Model Inference</span>
-            <p className="leading-relaxed">{link.modelInferenceNote}</p>
+            <span className="type-caption uppercase tracking-wider text-outline block mb-1.5">Signal Note</span>
+            <p className="leading-relaxed">{link.signalNote}</p>
           </div>
         </div>
       </section>

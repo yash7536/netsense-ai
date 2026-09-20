@@ -56,7 +56,7 @@ export default function NetworkLinks() {
             Every link, at a glance.
           </h1>
           <p className="type-body-lg text-on-surface-variant max-w-2xl">
-            Real-time transit corridors, latency margins, and packet integrity across regions.
+            Transit corridors, latency margins, and packet integrity across regions.
           </p>
         </div>
       </section>

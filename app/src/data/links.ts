@@ -25,12 +25,12 @@ export const LINKS: NetworkLink[] = [
       "DWDM Lambda 4B operating at -11.2 dBm optical margin between Mumbai (West) and Delhi (North).",
     bufferDynamicsNote:
       "Egress buffers on PE-BOM-02 indicate micro-burst congestion toward Delhi core router DEL-GW-01.",
-    modelInferenceNote:
-      "Autoregressive inference models 91% confidence of latency cascade on Mumbai–Delhi Core.",
+    signalNote:
+      "Demo signal: 91% confidence of latency cascade on Mumbai–Delhi Core.",
     deviceChassis: "BOM-DC2-SW01",
     ingressInterface: "HundredGigE0/1/0/3",
-    samplingRate: "100ms Telemetry",
-    modelEngine: "Cascade-v3.8",
+    samplingInterval: "30 min",
+    detectionMethod: "Rule-based scoring",
   },
   {
     id: "mumbai-pune-metro",
@@ -52,12 +52,12 @@ export const LINKS: NetworkLink[] = [
     },
     physicalLayerNote: "Direct fiber pair 04 operating within nominal optical margin between Mumbai and Pune.",
     bufferDynamicsNote: "Ingress queue on PNQ-DC1-CR01 tracking elevated retransmit rate during evening peak.",
-    modelInferenceNote:
-      "Autoregressive inference models 94% confidence of packet-loss degradation on Mumbai–Pune Metro.",
+    signalNote:
+      "Demo signal: 94% confidence of packet-loss degradation on Mumbai–Pune Metro.",
     deviceChassis: "PNQ-DC1-SW02",
     ingressInterface: "TenGigE0/0/0/7",
-    samplingRate: "100ms Telemetry",
-    modelEngine: "Cascade-v3.8",
+    samplingInterval: "30 min",
+    detectionMethod: "Rule-based scoring",
   },
   {
     id: "delhi-bengaluru-core",
@@ -79,12 +79,12 @@ export const LINKS: NetworkLink[] = [
     },
     physicalLayerNote: "Backbone primary loop A carrying sustained ingress cap pressure toward Bengaluru.",
     bufferDynamicsNote: "Egress interface on BLR-DC2-CR03 tracking sustained bandwidth saturation above 90%.",
-    modelInferenceNote:
-      "Autoregressive inference models 87% confidence of bandwidth saturation on Delhi–Bengaluru Core.",
+    signalNote:
+      "Demo signal: 87% confidence of bandwidth saturation on Delhi–Bengaluru Core.",
     deviceChassis: "BLR-DC2-SW04",
     ingressInterface: "HundredGigE0/2/0/1",
-    samplingRate: "100ms Telemetry",
-    modelEngine: "Cascade-v3.8",
+    samplingInterval: "30 min",
+    detectionMethod: "Rule-based scoring",
   },
   {
     id: "bengaluru-chennai-core",
@@ -106,12 +106,12 @@ export const LINKS: NetworkLink[] = [
     },
     physicalLayerNote: "Intercity Ring C operating within nominal optical margin between Bengaluru and Chennai.",
     bufferDynamicsNote: "No anomalous buffer behaviour observed on MAA-DC1-CR02 in the current window.",
-    modelInferenceNote:
-      "Autoregressive inference models 78% confidence of a minor jitter spike on Bengaluru–Chennai Core.",
+    signalNote:
+      "Demo signal: 78% confidence of a minor jitter spike on Bengaluru–Chennai Core.",
     deviceChassis: "MAA-DC1-SW01",
     ingressInterface: "TenGigE0/1/0/3",
-    samplingRate: "100ms Telemetry",
-    modelEngine: "Cascade-v3.8",
+    samplingInterval: "30 min",
+    detectionMethod: "Rule-based scoring",
   },
   {
     id: "bengaluru-hyderabad-core",
@@ -133,12 +133,12 @@ export const LINKS: NetworkLink[] = [
     },
     physicalLayerNote: "Central Optical Highway carrying an early BGP path dampening oscillation at Hyderabad IX.",
     bufferDynamicsNote: "Peering session on HYD-DC1-CR02 flapping intermittently under transit reroute pressure.",
-    modelInferenceNote:
-      "Autoregressive inference models 83% confidence of link health degradation on Bengaluru–Hyderabad Core.",
+    signalNote:
+      "Demo signal: 83% confidence of link health degradation on Bengaluru–Hyderabad Core.",
     deviceChassis: "HYD-DC1-SW03",
     ingressInterface: "HundredGigE0/0/0/5",
-    samplingRate: "100ms Telemetry",
-    modelEngine: "Cascade-v3.8",
+    samplingInterval: "30 min",
+    detectionMethod: "Rule-based scoring",
   },
   {
     id: "chennai-pune-core",
@@ -160,12 +160,12 @@ export const LINKS: NetworkLink[] = [
     },
     physicalLayerNote: "Southern Transit Ring 01 recovering after a resolved optical attenuation drift.",
     bufferDynamicsNote: "Buffer occupancy on PNQ-DC2-CR02 has returned to nominal following recent mitigation.",
-    modelInferenceNote:
-      "Autoregressive inference models 81% confidence of periodic latency oscillation on Chennai–Pune Core.",
+    signalNote:
+      "Demo signal: 81% confidence of periodic latency oscillation on Chennai–Pune Core.",
     deviceChassis: "PNQ-DC2-SW01",
     ingressInterface: "TenGigE0/2/0/4",
-    samplingRate: "100ms Telemetry",
-    modelEngine: "Cascade-v3.8",
+    samplingInterval: "30 min",
+    detectionMethod: "Rule-based scoring",
   },
 ];
 

@@ -66,7 +66,7 @@ export default function Engineers() {
           <div className="max-w-2xl">
             <h1 className="type-display-xl text-5xl md:text-6xl lg:text-[64px] leading-[1.02] text-primary mb-4">Who's on it.</h1>
             <p className="type-body-lg text-on-surface-variant mt-3 tracking-tight max-w-2xl font-normal">
-              Real-time telemetric roster, corridor duty mapping, and active incident mitigation teams across core topology nodes.
+              Engineer roster, corridor duty mapping, and active incident mitigation teams across core topology nodes.
             </p>
           </div>
           <div className="flex items-baseline gap-8 lg:gap-12 pt-2 lg:pt-0">

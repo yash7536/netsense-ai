@@ -65,8 +65,8 @@ export default function Predictions() {
           </div>
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-start md:items-end">
-              <span className="type-caption uppercase tracking-[0.08em] text-outline font-medium">Model Status</span>
-              <span className="type-telemetry-code text-primary font-medium tracking-tight">v4.8-telemetry · LIVE</span>
+              <span className="type-caption uppercase tracking-[0.08em] text-outline font-medium">Detection</span>
+              <span className="type-telemetry-code text-primary font-medium tracking-tight">Rule-based · Synthetic data</span>
             </div>
           </div>
         </div>

@@ -4,7 +4,7 @@ Predictive network monitoring and incident investigation — a working product p
 
 NetSense turns raw link telemetry into a workflow an operator can actually act on: it flags which corridors are drifting from baseline, surfaces the predictive signal and evidence behind that flag, links it to any incident it produced, and shows who is investigating it — all in one connected, explorable product instead of a wall of static charts.
 
-Built during a Product Management internship at Tata Teleservices Ltd.
+Network-operations exposure during my Tata Teleservices internship helped shape the problem framing for this independently built prototype.
 
 ## Live Demo
 
@@ -167,4 +167,4 @@ Realistic next steps, not current functionality:
 
 ## Project Context
 
-Built during a Product Management internship at Tata Teleservices Ltd., as a self-directed prototype exploring how predictive network telemetry could be made explorable and actionable for network operators.
+Network-operations exposure during my Tata Teleservices internship helped shape the problem framing for this independently built prototype, which explores how predictive network telemetry could be made explorable and actionable for network operators.
