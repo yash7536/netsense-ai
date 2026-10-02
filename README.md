@@ -6,6 +6,8 @@ NetSense turns raw link telemetry into a workflow an operator can actually act o
 
 Network-operations exposure during my Tata Teleservices internship helped shape the problem framing for this independently built prototype.
 
+**Stack:** Python (rule-based scoring engine, seeded synthetic telemetry, evaluation harness) · React 19 + TypeScript + Vite · Tailwind CSS v4
+
 ## Live Demo
 
 **[https://netsense-ai-bclu.vercel.app/](https://netsense-ai-bclu.vercel.app/)**
@@ -38,7 +40,7 @@ Telemetry
               → resolution
 ```
 
-Every step above is a real, linked record in the product — a prediction always points back to the link it came from and forward to the incident it produced (if any); an incident always points to its originating prediction and its assigned engineer. Nothing here implies autonomous infrastructure changes — the workflow ends at operator investigation and action, by design.
+Every step above is a real, linked record in the product: each prediction points back to the corridor it came from, and each incident points to its corridor, its assigned engineer and — for five of the six — the prediction it originated from. (The authored cross-references are not perfectly symmetric: INC-391 names no originating prediction, and PRD-101 and PRD-103 do not link forward to the incidents that name them. `python -m netsense validate-seed` reports these.) Nothing here implies autonomous infrastructure changes — the workflow ends at operator investigation and action, by design.
 
 ## Key Product Capabilities
 
@@ -62,28 +64,72 @@ Every step above is a real, linked record in the product — a prediction always
 
 ## Detection Approach
 
-Detection is deterministic and fully inspectable — there is no black box.
+Detection is deterministic and fully inspectable — there is no black box. The reference implementation is the Python engine in [`engine/`](engine/) (`engine/netsense/scoring.py`); the app's TypeScript scorer (`app/src/lib/derive.ts`) is held to identical results by parity tests.
 
 For each link, current telemetry is compared against that link's own baseline:
 
 1. **Deviation terms** are computed for latency, packet loss, jitter, and bandwidth utilisation, each normalised to its own "notable excursion" scale and capped at 1 (so a metric with a near-zero baseline, like packet loss, doesn't blow up the score).
 2. A **weighted composite anomaly score** (latency 40%, loss 30%, jitter 15%, bandwidth 15%) combines those terms into a single 0–1 figure.
-3. A link is flagged for **attention** once its anomaly score crosses a shared threshold (`0.22`) — the same threshold is used everywhere that number is shown, so the product can never show a link as "healthy" in one place and "attention" in another.
+3. A link is flagged for **attention** once its anomaly score reaches a shared threshold (`0.22`) — one constant, used everywhere that verdict is shown. (A corridor's *display* status is the worse of that live state and any authored high/critical record on it, so an authored incident can keep a corridor flagged while its live score is healthy — see the evaluation below.)
 4. A **health score** (100 − anomaly score × 38, floored at 55) gives the same information as a single top-line percentage.
 
-Predictions and incidents are authored example signals — severity, confidence, narrative, and evidence values are fixed dataset content representing what a rule engine would plausibly surface, not live model output. What *is* computed live from each record's real fields: the risk-horizon curve on Prediction Detail reshapes its inflection point from that prediction's actual `horizonHours` and `confidencePct`, and every cross-reference between a link, prediction, incident, and engineer is resolved from the same shared dataset at render time — so the numbers stay internally consistent everywhere they appear.
+The scorer looks at **one instant** — the latest sample — and has no memory of earlier ones.
+
+Predictions and incidents are **authored demonstration content** — severity, confidence, fault labels, narrative, and engineer assignment are fixed dataset records representing what a rule engine might surface, not live model output. What *is* computed live from each record's real fields: the risk-horizon curve on Prediction Detail reshapes its inflection point from that prediction's actual `horizonHours` and `confidencePct`, and every cross-reference between a link, prediction, incident, and engineer is resolved from the same shared dataset at render time. How closely the authored layer agrees with the computed one is measured, not assumed — see Evaluation.
+
+The engine's rule-based workflow (`engine/netsense/workflow.py`) joins these stages and labels each as computed or authored:
+
+```
+signal (computed) → severity/confidence (authored) → prediction (authored) → linked incident (authored) → engineer context (authored assignment)
+```
+
+It reads and links records; it never creates, resolves or reassigns anything.
+
+
+## Evaluation
+
+The detector is a hand-written rule, not a trained model, so there is no model accuracy to report. It is evaluated against **designed test scenarios** instead. Method, full results and limitations: [`docs/EVALUATION.md`](docs/EVALUATION.md). The expected states were pre-registered in [`docs/PROFILE_SPEC.md`](docs/PROFILE_SPEC.md) and committed before the engine existed; result files are in [`docs/results/`](docs/results/).
+
+| Measurement | Result |
+|---|---|
+| Rule-based detection agreement on 6 designed telemetry profiles | **5/5** resolvable profiles matched their expected state (1 unresolvable profile reported separately) |
+| Authored-vs-computed consistency audit (a separate check; never combined with the above) | **10** consistent, **2** flagged, **1** not comparable, across 13 records (7 predictions + 6 incidents) |
+
+The 5/5 is rule-based detection agreement on synthetic scenarios the rule's author designed — a sanity check that the rule does what it was meant to, not accuracy and not evidence about real networks.
+
+**The finding:** on the intermittent-instability profile (Bengaluru–Hyderabad Core) the detector scores **0.16** and reads the corridor **healthy**, while the authored data holds an open, high-severity incident (INC-395) on the same corridor. Even scoring every sample in the trailing 24 hours with the same single-sample rule never reaches the threshold (peak 0.2169 against 0.22). Rolling-window scoring is documented as the next step and is **not built**; whether it would catch this is untested.
+
+## How to reproduce
+
+```bash
+# Python engine and evaluation (standard library only; pytest for tests)
+cd engine
+python -m venv .venv
+.venv/Scripts/python -m pip install -e ".[dev]"    # Windows; on macOS/Linux use .venv/bin/python
+.venv/Scripts/python -m netsense evaluate          # prints the results and rewrites docs/results/*.json
+.venv/Scripts/python -m netsense check             # fails if the app's generated data or the results drifted
+.venv/Scripts/python -m pytest                     # unit, evaluation, spec and TypeScript-parity tests
+.venv/Scripts/python -m netsense build-data        # regenerate app/src/data/generated/
+
+# App (parity tests need `npm install` here; the app itself needs no Python at build time)
+cd ../app
+npm install
+npm run dev
+npm run typecheck && npm run lint && npm run build
+```
 
 ## Technical Architecture
 
+- **Python engine (`engine/`)** — standard library only; **pytest** for tests. Seeded synthetic-telemetry generator, the rule-based scorer, the anomaly-to-incident workflow, and the evaluation harness. It is the source of truth for the app's data: it validates the authored seed (`engine/seed/`), generates the telemetry, and writes the JSON the app imports (`app/src/data/generated/`, committed, so the app's build needs no Python).
 - **React 19 + TypeScript + Vite**, **React Router 7** for client-side routing, **Tailwind CSS v4** (via `@tailwindcss/vite`) for styling.
-- **`src/data/`** — the dataset: 6 India network corridors, 7 predictions, 6 incidents, 10 engineers, and a deterministic 48h+12h telemetry generator seeded per link.
-- **`src/lib/derive.ts`** — the anomaly/health scoring described above.
+- **`src/data/`** — thin typed modules over the generated JSON: 6 India network corridors, 7 predictions, 6 incidents, 10 engineers, and seeded 30-minute telemetry (`t = -48h … +12h`) per link.
+- **`src/lib/derive.ts`** — the anomaly/health scoring described above (TypeScript; held to the Python engine by exact-equality parity tests).
 - **`src/lib/aggregate.ts`** — cross-references links, predictions, incidents, and engineers so every screen agrees.
 - **`src/components/charts/`** — reusable SVG chart primitives (`TelemetryTrendChart`, `Sparkline`, `HealthRing`, `RiskHorizonMini`, `RouteTopology`), all driven by real data arrays and scaled via `viewBox` rather than fixed pixel sizes.
 - **`src/components/motion/`** — small, shared motion primitives (count-up, animated bar/path, fade-in) that respect `prefers-reduced-motion` globally.
 - **`src/pages/`** — the routed screens listed above.
 
-The dataset, scoring, and chart layers are separated from the page components specifically so the deterministic detection logic in `derive.ts` could be swapped for a real backend or trained model later without rewriting the UI — the pages consume computed vitals through a stable shape, not raw telemetry math inline.
+The dataset, scoring, and chart layers are separated from the page components, and the pages consume computed vitals through a stable shape rather than raw telemetry math inline — so the detection logic could later be replaced by a backend or a different method without rewriting the screens. That is a structural property of the code, not something that has been done or tested.
 
 ## Repository Structure
 
@@ -95,12 +141,23 @@ app/                                  the actual product (deploys to Vercel)
       motion/                        CountUp, AnimatedBar, AnimatedPath, FadeIn, HoverTip, TooltipCard
       layout/                        AppShell (sidebar + header)
       ui/                            SortArrow, StatusTag
-    data/                            links, predictions, incidents, engineers, telemetry generator
+    data/                            typed modules over generated/ (links, predictions, incidents, engineers, telemetry JSON from the engine)
     lib/                             derive (scoring), aggregate (cross-references), sort, format, motion, status
     pages/                           Overview, NetworkLinks(+Detail), Predictions(+Detail), Incidents(+Detail), Engineers(+Detail)
+  scripts/                           parity helpers + the legacy TypeScript generator (reference only)
   public/
   package.json
   vercel.json                        SPA rewrite so deep links resolve on Vercel
+
+engine/                               the Python engine (source of truth for the app's data)
+  netsense/                          telemetry, scoring, profiles, workflow, evaluation, dataset, cli
+  seed/                              authored demonstration content (links, predictions, incidents, engineers)
+  tests/                             pytest suite, incl. TypeScript parity
+
+docs/
+  PROFILE_SPEC.md                    pre-registered profiles and expected states
+  EVALUATION.md                      method, results, limitations
+  results/                           committed JSON results
 
 stitch_netsense_ai_design_system/     the approved Stitch design source
   netsense_ai/DESIGN.md               design tokens, brand & style rationale
@@ -142,23 +199,29 @@ npm run lint        # oxlint
 npm run build        # tsc -b && vite build
 ```
 
+The Python engine and evaluation commands are under [How to reproduce](#how-to-reproduce).
+
 ## Validation
 
 As of the current commit:
 
 - `npm run typecheck`, `npm run lint`, and `npm run build` all pass cleanly.
-- Manually verified responsive behaviour at 375 / 390 / 768 / 1024 / 1280 / 1440px with no horizontal overflow.
-- Manually verified no console errors across all core screens and their detail routes.
-- No automated test suite exists yet — validation above is manual/build-level only.
+- The pytest suite in `engine/` passes, including exact-equality parity checks between the Python engine and the app's TypeScript scorer, and a check that the committed generated data and results match what the engine produces.
+- When the app was switched to read engine-generated data, every route was screenshotted before and after at 375px and 1440px and the images were pixel-identical.
+- Manually verified responsive behaviour at 375 / 390 / 768 / 1024 / 1280 / 1440px with no horizontal overflow, and no console errors across the core screens.
+- There is no automated browser/UI test suite; UI checks are manual and screenshot-based.
 
 ## Limitations / Disclosure
 
 This is a portfolio prototype using synthetic, generated telemetry. The detection and risk logic is deterministic and rule-based rather than a trained ML model. It is not connected to a production network, has no real customers, and performs no autonomous remediation — every workflow surfaces evidence for a human operator to act on.
 
+Evaluation-specific limits (detail in [`docs/EVALUATION.md`](docs/EVALUATION.md)): the test scenarios were designed by the rule's author, so agreement is partly by construction; five resolvable scenarios is a sanity check, not a performance claim; the detector scores a single instant and misses the designed intermittent-instability case; and prediction severity, confidence, fault labels, incidents and engineer assignment are authored demonstration content, not outputs of the detector.
+
 ## Future Direction
 
 Realistic next steps, not current functionality:
 
+- **Rolling-window / variance-aware scoring** — documented as the next step after the oscillation finding; **not built**, and its value would need its own pre-registered evaluation.
 - Ingesting real telemetry from production or lab network equipment.
 - A real backend/API layer instead of an in-browser generated dataset.
 - Replacing the rule-based scoring with a trained anomaly-detection model.

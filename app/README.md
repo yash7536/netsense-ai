@@ -24,11 +24,13 @@ npm run build       # tsc -b && vite build
 ## Structure
 
 - `src/data/` — the dataset: 6 approved India corridors (`links.ts`), 7
-  predictions, 6 incidents, 10 engineers, and a deterministic 48h+12h
-  telemetry generator (`telemetry.ts`) seeded per link so numbers are stable
-  across reloads but genuinely computed, not hand-typed per screen.
-- `src/lib/derive.ts` — turns raw telemetry into health score / anomaly score
-  / status for a link (`ANOMALY_ATTENTION_THRESHOLD` is the single shared
+  predictions, 6 incidents, 10 engineers. These are thin typed modules over
+  `src/data/generated/*.json`, which the Python engine in `../engine` produces
+  (authored seed records + seeded 30-minute telemetry, `t = -48h … +12h`).
+  Edit `engine/seed/`, then run `python -m netsense build-data` from `engine/`;
+  do not edit the generated files by hand. The app needs no Python at build time.
+- `src/lib/derive.ts` — turns telemetry into health score / anomaly score
+  / status for a link (the Python engine is the reference implementation; parity tests hold the two equal) (`ANOMALY_ATTENTION_THRESHOLD` is the single shared
   threshold used everywhere that number is displayed).
 - `src/lib/aggregate.ts` — cross-references links ↔ predictions ↔ incidents ↔
   engineers so every screen agrees (e.g. a link with an open critical
