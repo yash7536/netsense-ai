@@ -21,11 +21,74 @@ This is a portfolio prototype, not a production system. To be specific about wha
 - It is not connected to a production network and has no real customers.
 - There is no autonomous remediation. Every workflow ends at an operator decision point, never an automatic infrastructure change.
 
-## Why I Built It
+## Case Study
 
-Traditional monitoring tells an operator what is happening *right now*. It rarely explains what changed, why it matters, or what to do next — that context is usually scattered across separate dashboards, ticketing tools, and tribal knowledge.
+The story in the order an AI PM would reason through it — from the user problem, through the workflow, evaluation and failure, to what is and is not established. The supporting documents in [`docs/`](docs/) hold the evidence behind each step; this section is the front door, not a copy of them.
 
-NetSense is designed around a single question: when a corridor starts to drift, can the product get an operator from *"something's off"* to *"here's the evidence, here's the incident, here's who owns it"* without leaving the screen they're already on?
+### 1. Real user problem
+
+The user is a **network operations engineer** responsible for a set of live corridors — someone who has to notice abnormal link behavior, judge whether it is a real signal, gather the evidence behind it, and decide who should act. The pain is not "too much data": going from *"something changed"* to *"I know what it is, why it matters, and who owns it"* means assembling context by hand across separate telemetry, alerting and ticketing views, which costs decision confidence as much as time.
+
+Full framing, the product problem statement and the product hypothesis: [`docs/PROBLEM.md`](docs/PROBLEM.md).
+
+### 2. Product insight
+
+The deeper problem is the friction in connecting **signal → evidence → prediction/context → incident → ownership → human decision**. Each normally lives in a different tool. The opportunity is not a better chart; it is removing the seams so an operator reviews them together instead of reassembling them by hand.
+
+> **From fragmented monitoring and investigation, toward a connected detection-to-investigation workflow — where the abnormal signal, its evidence and its incident context can be reviewed together, before a human makes a decision.**
+
+### 3. Before → After
+
+**Before** (a workflow hypothesis informed by general domain exposure, not a reconstruction of any specific employer's process): monitor telemetry and alerts across separate tools, notice an abnormal metric, compare several metrics by hand, look up or create a ticket elsewhere, work out ownership separately.
+
+**After**, mapped to what the product does: Overview → a flagged corridor → its evidence → the prediction behind it → the incident it produced (timeline linked to the telemetry chart) → the assigned engineer → **the operator decides**. Nothing in that path is automated. Any time or effort saved is a hypothesis, not a measurement.
+
+### 4. AI / automation workflow
+
+```
+Input → Processing → Detection → Evidence → Context → Human review → Decision
+```
+
+Only one part is computed: the seeded synthetic telemetry and the anomaly/health scoring derived from it — a deterministic, weighted-deviation rule, **not machine learning**. The Python engine in [`engine/`](engine/) is the reference implementation and generates the data the app reads; the app's TypeScript scorer is held to it by exact-equality parity tests. Prediction severity, confidence, fault labels, incident narratives and engineer assignment are **authored demonstration content**. The engine's rule-based workflow joins these stages and labels each as computed or authored; it never creates, resolves or assigns anything.
+
+Detail, including the computed/authored/human/future table and why a rule was chosen over ML: [`docs/AI-WORKFLOW.md`](docs/AI-WORKFLOW.md).
+
+### 5. Evaluation
+
+Matched the expected state in **5/5 resolvable cases across 6 telemetry profiles**, with a rule-based anomaly-to-incident workflow (not trained ML). The detector is a hand-written rule, so it is evaluated against designed scenarios rather than scored for accuracy. The expected states were pre-registered in [`docs/PROFILE_SPEC.md`](docs/PROFILE_SPEC.md) before the engine existed; method, results and limitations are in [`docs/EVALUATION.md`](docs/EVALUATION.md), with committed result files in [`docs/results/`](docs/results/).
+
+| Measurement | Result |
+|---|---|
+| Rule-based detection agreement on 6 designed telemetry profiles | **5/5** resolvable profiles matched their expected state (1 unresolvable profile reported separately) |
+| Authored-vs-computed consistency audit (a separate check; never combined with the above) | **10** consistent, **2** flagged, **1** not comparable, across 13 records (7 predictions + 6 incidents) |
+
+The 5/5 is agreement on synthetic scenarios the rule's author designed — a sanity check that the rule does what it was meant to, not accuracy and not evidence about real networks.
+
+**The finding:** a **temporal blind spot** — a healthy score (~0.16) beside an active high-severity incident (INC-395, Bengaluru–Hyderabad Core). Rolling-window scoring is documented as the next step and is **not built**.
+
+### 6. Failure modes
+
+The central, evaluation-found failure is that blind spot: an operator sees a corridor read healthy while an active, high-severity incident sits on the same corridor — a contradiction on the two screens they would check together. Four further failure modes exist structurally (the authored-vs-computed seam, limited signal coverage, missing-telemetry handling, confidence ambiguity). Inventory, prioritisation and reasoning: [`docs/FAILURES-GUARDRAILS.md`](docs/FAILURES-GUARDRAILS.md).
+
+### 7. Guardrails and human control
+
+Verified against the code: no autonomous remediation, no automatic incident creation or resolution, no automatic engineer assignment, deterministic and inspectable scoring, evidence shown beside every claim, and the synthetic nature of the data disclosed. A rerunnable consistency audit, a drift check on generated data and TypeScript/Python parity tests guard against the layers silently diverging. The principle for what is not built: **when evidence is unreliable or conflicting, reduce automation and increase transparency — never let the system decide anyway.** Details: [`docs/FAILURES-GUARDRAILS.md`](docs/FAILURES-GUARDRAILS.md).
+
+### 8. Product decision and tradeoff
+
+After the blind spot surfaced it was **not** cosmetically patched: the synthetic telemetry was not retuned and the formula and `0.22` threshold were not changed in reaction to one case. Either would have made the evaluation look better without proving anything. The failure was kept visible, and rolling-window scoring was documented as the next step. The tradeoff: patching would have made the prototype look more finished while hiding exactly what an evaluation exists to find; preserving it keeps the limitation visible and turns it into a specific, testable next step. That is prioritisation, not an unfinished product.
+
+### 9. Business and user value
+
+**Established in the public record:** a genuinely connected workflow (clickable link ↔ prediction ↔ incident ↔ engineer relationships), 5/5 agreement on the designed scenarios, and human review required everywhere. **Value hypotheses, not measured results:** faster triage, lower investigation friction, less context switching, better use of engineering attention, earlier identification of potentially important issues. No monetary values or percentages are attached to any of them. Value tree and metrics plan: [`docs/VALUE.md`](docs/VALUE.md).
+
+### 10. What the public record does and does not establish
+
+Real-world testing of the prototype was done in a confidential network-operations setting with company data. The underlying data, organization-specific findings and detailed feedback are confidential and are not reproduced here; this repository and the public case study use synthetic telemetry only. The public record therefore contains no user-testing results, and these remain hypotheses publicly: that NetSense reduces investigation time or context switching, that operators prefer the connected workflow, that it improves decision confidence or escalation quality, and that the value justifies the added complexity.
+
+### 11. Next step
+
+Rolling-window / variance-aware scoring is the documented next step and is **not built**. Its value would need its own pre-registered evaluation before anything is claimed. Further user validation would be documented here only to the extent it can be disclosed.
 
 ## Product Workflow
 
@@ -70,12 +133,12 @@ For each link, current telemetry is compared against that link's own baseline:
 
 1. **Deviation terms** are computed for latency, packet loss, jitter, and bandwidth utilisation, each normalised to its own "notable excursion" scale and capped at 1 (so a metric with a near-zero baseline, like packet loss, doesn't blow up the score).
 2. A **weighted composite anomaly score** (latency 40%, loss 30%, jitter 15%, bandwidth 15%) combines those terms into a single 0–1 figure.
-3. A link is flagged for **attention** once its anomaly score reaches a shared threshold (`0.22`) — one constant, used everywhere that verdict is shown. (A corridor's *display* status is the worse of that live state and any authored high/critical record on it, so an authored incident can keep a corridor flagged while its live score is healthy — see the evaluation below.)
+3. A link is flagged for **attention** once its anomaly score reaches a shared threshold (`0.22`) — one constant, used everywhere that verdict is shown. (A corridor's *display* status is the worse of that live state and any authored high/critical record on it, so an authored incident can keep a corridor flagged while its live score is healthy — see [`docs/EVALUATION.md`](docs/EVALUATION.md).)
 4. A **health score** (100 − anomaly score × 38, floored at 55) gives the same information as a single top-line percentage.
 
 The scorer looks at **one instant** — the latest sample — and has no memory of earlier ones.
 
-Predictions and incidents are **authored demonstration content** — severity, confidence, fault labels, narrative, and engineer assignment are fixed dataset records representing what a rule engine might surface, not live model output. What *is* computed live from each record's real fields: the risk-horizon curve on Prediction Detail reshapes its inflection point from that prediction's actual `horizonHours` and `confidencePct`, and every cross-reference between a link, prediction, incident, and engineer is resolved from the same shared dataset at render time. How closely the authored layer agrees with the computed one is measured, not assumed — see Evaluation.
+Predictions and incidents are **authored demonstration content** — severity, confidence, fault labels, narrative, and engineer assignment are fixed dataset records representing what a rule engine might surface, not live model output. What *is* computed live from each record's real fields: the risk-horizon curve on Prediction Detail reshapes its inflection point from that prediction's actual `horizonHours` and `confidencePct`, and every cross-reference between a link, prediction, incident, and engineer is resolved from the same shared dataset at render time. How closely the authored layer agrees with the computed one is measured, not assumed — see [`docs/EVALUATION.md`](docs/EVALUATION.md).
 
 The engine's rule-based workflow (`engine/netsense/workflow.py`) joins these stages and labels each as computed or authored:
 
@@ -85,19 +148,6 @@ signal (computed) → severity/confidence (authored) → prediction (authored) �
 
 It reads and links records; it never creates, resolves or reassigns anything.
 
-
-## Evaluation
-
-The detector is a hand-written rule, not a trained model, so there is no model accuracy to report. It is evaluated against **designed test scenarios** instead. Method, full results and limitations: [`docs/EVALUATION.md`](docs/EVALUATION.md). The expected states were pre-registered in [`docs/PROFILE_SPEC.md`](docs/PROFILE_SPEC.md) and committed before the engine existed; result files are in [`docs/results/`](docs/results/).
-
-| Measurement | Result |
-|---|---|
-| Rule-based detection agreement on 6 designed telemetry profiles | **5/5** resolvable profiles matched their expected state (1 unresolvable profile reported separately) |
-| Authored-vs-computed consistency audit (a separate check; never combined with the above) | **10** consistent, **2** flagged, **1** not comparable, across 13 records (7 predictions + 6 incidents) |
-
-The 5/5 is rule-based detection agreement on synthetic scenarios the rule's author designed — a sanity check that the rule does what it was meant to, not accuracy and not evidence about real networks.
-
-**The finding:** on the intermittent-instability profile (Bengaluru–Hyderabad Core) the detector scores **0.16** and reads the corridor **healthy**, while the authored data holds an open, high-severity incident (INC-395) on the same corridor. Even scoring every sample in the trailing 24 hours with the same single-sample rule never reaches the threshold (peak 0.2169 against 0.22). Rolling-window scoring is documented as the next step and is **not built**; whether it would catch this is untested.
 
 ## How to reproduce
 
@@ -155,8 +205,12 @@ engine/                               the Python engine (source of truth for the
   tests/                             pytest suite, incl. TypeScript parity
 
 docs/
+  PROBLEM.md                         user, pain, hypothesis, before/after
+  AI-WORKFLOW.md                     computed vs authored vs human vs future
   PROFILE_SPEC.md                    pre-registered profiles and expected states
   EVALUATION.md                      method, results, limitations
+  FAILURES-GUARDRAILS.md             failure modes, guardrails, fallbacks, decisions
+  VALUE.md                           value hypotheses, metrics plan
   results/                           committed JSON results
 
 stitch_netsense_ai_design_system/     the approved Stitch design source
