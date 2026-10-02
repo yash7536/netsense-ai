@@ -29,6 +29,8 @@ The story in the order an AI PM would reason through it — from the user proble
 
 The user is a **network operations engineer** responsible for a set of live corridors — someone who has to notice abnormal link behavior, judge whether it is a real signal, gather the evidence behind it, and decide who should act. The pain is not "too much data": going from *"something changed"* to *"I know what it is, why it matters, and who owns it"* means assembling context by hand across separate telemetry, alerting and ticketing views, which costs decision confidence as much as time.
 
+NetSense was scoped from 3 fault-management pain points documented during the internship: (1) fault alerts arrive as separate signals, so engineers must manually connect an anomaly to its evidence and incident context; (2) evidence for a flagged anomaly is spread across separate telemetry views, so engineers compare several raw metrics by hand before trusting a signal; (3) ownership of an incident is tracked separately from the telemetry, so it takes extra steps to find who is investigating it.
+
 Full framing, the product problem statement and the product hypothesis: [`docs/PROBLEM.md`](docs/PROBLEM.md).
 
 ### 2. Product insight

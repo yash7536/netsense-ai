@@ -18,13 +18,13 @@ The primary user is a **network operations (NOC) operator or network operations 
 
 The pain here is **not** "there's too much data." It's that **going from "something changed" to "I know what it is, why it matters, and who owns it" takes too many steps and too many separate views** — telemetry dashboards, monitoring alerts, incident/ticketing records, and whatever context lives in someone's head or a chat thread, none of which are inherently connected to each other.
 
-Concretely, an operator working this way has to answer several questions before they can act with any confidence, and today those answers usually live in different places:
+NetSense was **scoped from 3 fault-management pain points documented during the internship**. They are stated here generically, with no company data:
 
-- *What is going wrong?* — a metric or alert.
-- *Which link does it affect, and how serious does it actually look?* — requires comparing several metrics against what's normal for that specific link.
-- *What evidence supports this being real?* — requires pulling up the underlying telemetry, not just the alert.
-- *Is there already an incident for this, or does one need to be opened?* — a separate lookup, often in a separate system.
-- *Who is or should be investigating it?* — ownership/assignment context that may not be attached to the telemetry at all.
+1. **Alerts arrive as separate signals.** Fault alerts show up on their own, so engineers must manually connect an anomaly to its evidence and incident context.
+2. **Evidence is spread across separate telemetry views.** For a flagged anomaly, engineers compare several raw metrics by hand before they trust the signal.
+3. **Ownership is tracked separately from the telemetry.** Finding who is investigating an incident takes extra steps.
+
+Each maps to a link in the connected workflow this prototype tests: pain point 1 → signal-to-incident context; pain point 2 → evidence beside the signal; pain point 3 → the assigned engineer on the incident.
 
 The cost of this fragmentation isn't just time — it's **decision confidence**. An operator can end up acting on a metric without its supporting evidence, or delaying a decision because assembling the full picture takes too long. This prototype is aimed specifically at that gap: not "more monitoring," but faster, more evidence-backed *investigation and decision-making* once something has already been flagged.
 
