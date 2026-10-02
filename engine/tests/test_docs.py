@@ -56,9 +56,28 @@ def test_headline_numbers_match_results(doc, results):
     s, a = drift["summary"], audit["summary"]
     assert f"**{s['agreement']}** resolvable profiles matched" in doc
     assert f"**{a['consistent']}** consistent, **{a['review']}** flagged, **{a['notComparable']}** not comparable" in doc
-    diag = next(r for r in drift["rows"] if r["profile"] == "oscillation")["diagnostic"]
-    assert f"**{diag['flaggedSamples']}/{diag['samples']}**" in doc
-    assert str(diag["maxSingleSampleScoreUnrounded"]) in doc
+    # The results file carries a descriptive diagnostic, but no claim in the doc depends on it.
+    assert "per-sample diagnostic" in doc and "not used for any claim" in doc
+    assert "maxSingleSampleScore" not in doc and "trailing 24" not in doc
+
+
+def test_failure_narrative_uses_the_agreed_wording(doc):
+    assert "temporal blind spot" in doc
+    assert "healthy score (~0.16) beside an active high-severity incident" in doc
+
+
+def test_every_relative_markdown_link_resolves(repo_root):
+    import re
+
+    files = [repo_root / "README.md", repo_root / "engine" / "README.md", *sorted((repo_root / "docs").glob("*.md"))]
+    broken = []
+    for f in files:
+        for target in re.findall(r"\]\(([^)#\s]+)(?:#[^)]*)?\)", f.read_text(encoding="utf-8")):
+            if target.startswith(("http://", "https://", "mailto:")):
+                continue
+            if not (f.parent / target).resolve().exists():
+                broken.append(f"{f.relative_to(repo_root)} -> {target}")
+    assert broken == []
 
 
 def test_doc_states_what_it_is_not(doc):

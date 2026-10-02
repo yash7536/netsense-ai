@@ -1,6 +1,6 @@
 # NetSense evaluation
 
-This is the evaluation of the NetSense **rule-based** detector. It reports three separate measurements, each with its own method, and it states what they do **not** show. Everything here is reproducible from this repository with the commands at the bottom; every number below is copied from the committed result files in [`results/`](results/).
+This is the evaluation of the NetSense **rule-based** detector. It reports two separate measurements (plus a parity check), each with its own method, and it states what they do **not** show. Everything here is reproducible from this repository with the commands at the bottom; every number below is copied from the committed result files in [`results/`](results/).
 
 > **Scope.** The telemetry is synthetic and seeded. The detector is a hand-written rule, not a trained model, so there is no model accuracy to report. Nothing here is a claim about real networks, real outages, real users or any deployment.
 
@@ -10,11 +10,10 @@ This is the evaluation of the NetSense **rule-based** detector. It reports three
 |---|---|---|
 | Rule-based detection agreement on designed profiles | **5/5** resolvable profiles matched their pre-registered expected state (1 profile unresolvable, reported separately) | Does the rule give the state each designed test scenario implies? **Not** model accuracy. |
 | Authored-versus-computed consistency audit | **10** consistent, **2** flagged, **1** not comparable, across 13 records (7 predictions + 6 incidents) | Does the hand-authored demonstration layer agree with the live computed signal? A separate check. |
-| Oscillation window diagnostic | **0/48** trailing-24h samples would be flagged by the same single-sample rule (peak 0.2169, 0.0031 below the threshold) | Descriptive only; no pass/fail. |
 
-These three are different measurements and are never added together or presented as one accuracy figure.
+These two are different measurements and are never added together or presented as one accuracy figure.
 
-**The finding that matters:** on the intermittent-instability profile (Bengaluru–Hyderabad Core) the detector scores **0.16** and reads the corridor **healthy**, while the authored demonstration data holds an *open, high-severity* incident (INC-395) on that same corridor. The expected-state check could not assert a state for this profile in advance, and the consistency audit independently flags the contradiction. Rolling-window scoring is documented as the next step and is **not built**.
+**The finding that matters:** a **temporal blind spot** — on the intermittent-instability profile (Bengaluru–Hyderabad Core) the scorer gives a healthy score (~0.16) beside an active high-severity incident (INC-395, authored demonstration data) on that same corridor. The expected-state check could not assert a state for this profile in advance, and the consistency audit independently flags the contradiction. Rolling-window scoring is documented as the next step and is **not built**.
 
 ## What is being tested
 
@@ -53,19 +52,13 @@ Rule-based detection agreement against designed test scenarios (**not** model ac
 
 **5/5 resolvable profiles matched; 0 mismatched.** The oscillation row is reported, not scored.
 
-## Result 2 — The oscillation corridor
+## Result 2 — The temporal blind spot
 
 At `t = 0` the oscillation corridor is 15.6 ms against a 13.4 ms baseline (latency term 0.33) with jitter 1.3 ms against 0.9 ms (jitter term 0.20). Weighted, that is **0.16**, below the 0.22 threshold, so the corridor reads **healthy**.
 
 Beside it, the authored data holds **INC-395** — "BGP Peer Dampening", status *investigating*, authored severity *high* — on the same corridor. The consistency audit flags this as the one record where an open, severe incident has no live corroborating signal. (The app's display rule — the worse of live state and authored severity — still shows this corridor as needing attention, because of the authored incident; the live computed state is healthy. The engine reports this as `authored_severity_without_live_signal`.)
 
-**Descriptive diagnostic (not a scoring method).** To see whether the miss was "one unlucky instant", the harness applied the *same single-sample rule* to each of the 48 samples in the trailing 24 hours. **0 of 48** reach the threshold; the highest single-sample score is 0.2169, 0.0031 below 0.22.
-
-What that does and does not show:
-
-- It **does** show the miss is not just an unlucky sample: across the trailing day this rule never flags the designed intermittent instability, though it comes close.
-- It does **not** show that rolling-window or variance-aware scoring would catch it. That is a hypothesis. The oscillation's amplitude is modest, so a window-level rule might still sit under any sensible threshold; this evaluation cannot say.
-- It is not a rolling-window algorithm. It is not part of the engine, the app never uses it, and it has no pass/fail criterion.
+The scorer reads one instant and has no memory of earlier samples, so intermittent instability is a **temporal blind spot** for it. Rolling-window scoring is documented as the next step and is **not built**; this evaluation does not test whether it would help.
 
 ## Result 3 — Authored-versus-computed consistency audit
 
@@ -92,6 +85,23 @@ All 13 records compared with the live state of the corridor each points at (heur
 - **INC-395** (flagged, the significant one): described above — an open, high-severity incident on a corridor the detector reads as healthy.
 - **PRD-102** (flagged, minor): authored severity *medium* beside a *strong* live signal (0.44). It understates the live signal; it does not contradict it.
 
+## Failure analysis — INC-395
+
+```
+Oscillating telemetry (a 9-hour sine, the `oscillation` profile)
+  → the scorer reads one instant ("now") and gives it 0.16
+    → live state: healthy
+      → an active, high-severity incident (INC-395, authored demonstration data) sits on the same corridor
+        → an operator checking both screens sees a contradiction
+          → the evaluation surfaces it: a temporal blind spot
+```
+
+This is a product failure found by evaluation, not a coding bug: the scorer does exactly what it is written to do. [`FAILURES-GUARDRAILS.md`](FAILURES-GUARDRAILS.md) analyses its user impact, what the product correctly does not do when its layers disagree, and what a future guardrail would look like.
+
+## Product decision
+
+The failure is left visible on purpose. The synthetic telemetry was not retuned (that would make the table green without changing the product), the formula and the 0.22 threshold were not changed in reaction to one case, and rolling-window scoring is documented as the next step and **not built**. Keeping the failure is the point of having an evaluation.
+
 ## Verification that the engine matches the app
 
 The React app still scores telemetry in TypeScript (`app/src/lib/derive.ts`) while the Python engine generates the data it reads. They are held together by parity tests that compare **exactly**, with no tolerances:
@@ -106,7 +116,7 @@ The React app still scores telemetry in TypeScript (`app/src/lib/derive.ts`) whi
 - **Synthetic, designed scenarios.** The profiles were designed by the author of the rule, so strong agreement is partly by construction. Five scenarios is a sanity check that the rule does what its author intended, not evidence about real-world performance.
 - **Not model accuracy.** No precision, recall, F1 or false-positive rate is reported or implied; there is no labelled real data to compute them on.
 - **The resolvability split was a design decision** made by the author, with the earlier TypeScript result known (see Provenance).
-- **Single-instant scoring.** The rule has no memory of earlier samples (the scorer's interface takes one snapshot and a baseline). The oscillation result is a consequence of that, but this evaluation does not isolate it as the *only* cause.
+- **Single-instant scoring.** The scorer takes one snapshot and a baseline and has no memory of earlier samples; the temporal blind spot above follows from that design.
 - **Authored layer.** Severity, confidence, fault labels, incident content and engineer assignment are authored demonstration content. The audit measures their consistency with the live signal; it does not validate them as predictions.
 - **Heuristic bands** used by the audit are evaluation-only.
 - **No real-user or production evidence** of any kind is part of this evaluation.
@@ -126,5 +136,7 @@ python -m venv .venv
 .venv/Scripts/python -m pytest                     # unit, evaluation and spec tests
 cd ../app && npm install                           # enables the TypeScript parity tests in pytest
 ```
+
+The results file `drift_profile_eval.json` also carries a descriptive per-sample diagnostic for the oscillation profile; it is not used for any claim in this document.
 
 Result files: [`results/drift_profile_eval.json`](results/drift_profile_eval.json), [`results/consistency_audit.json`](results/consistency_audit.json), [`results/workflow_cases.json`](results/workflow_cases.json) (per-link workflow output, with each field marked computed or authored).
