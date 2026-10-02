@@ -1,6 +1,6 @@
 # NetSense engine
 
-The Python engine behind the NetSense prototype: **seeded synthetic telemetry**, a **rule-based scorer**, a **rule-based anomaly-to-incident workflow**, and the **evaluation harness**. Standard library only; `pytest` for tests.
+The Python engine behind the NetSense prototype: **seeded synthetic telemetry**, a **rule-based scorer**, a **rule-based anomaly-to-incident workflow**, and the **evaluation harness**. Standard library only; `pytest` for tests. Developed and tested on Python 3.14; written to avoid anything newer than 3.10 (declared in `pyproject.toml`) but not run on older interpreters.
 
 It is rule-based and deterministic. It is **not machine learning** (nothing is trained or learned), the telemetry is **synthetic**, and it is not connected to any network.
 
