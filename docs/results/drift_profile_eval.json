@@ -1,0 +1,218 @@
+{
+  "measurement": "rule-based detection agreement against designed test scenarios (not model accuracy)",
+  "spec": "docs/PROFILE_SPEC.md",
+  "threshold": 0.22,
+  "summary": {
+    "profiles": 6,
+    "resolvable": 5,
+    "unresolvable": 1,
+    "matches": 5,
+    "mismatches": 0,
+    "agreement": "5/5"
+  },
+  "rows": [
+    {
+      "profile": "stable",
+      "linkId": "bengaluru-chennai-core",
+      "linkName": "Bengaluru–Chennai Core",
+      "designedBehaviour": "No drift; sampling noise only.",
+      "resolvable": true,
+      "expectedState": "healthy",
+      "reason": "Nothing is designed to deviate.",
+      "anomalyScore": 0.0,
+      "healthScore": 100.0,
+      "state": "healthy",
+      "agreement": "match",
+      "terms": {
+        "latency": 0.0,
+        "loss": 0.0,
+        "jitter": 0.0,
+        "bandwidth": 0.0
+      },
+      "now": {
+        "t": 0.0,
+        "latencyMs": 8.6,
+        "lossPct": 0.01,
+        "jitterMs": 0.7,
+        "bandwidthPct": 55.2
+      },
+      "baseline": {
+        "latencyMs": 8.6,
+        "lossPct": 0.01,
+        "jitterMs": 0.7,
+        "bandwidthPct": 55
+      }
+    },
+    {
+      "profile": "recovering",
+      "linkId": "chennai-pune-core",
+      "linkName": "Chennai–Pune Core",
+      "designedBehaviour": "A past excursion centred at t=-30h (Gaussian, width 4h) that has since cleared.",
+      "resolvable": true,
+      "expectedState": "healthy",
+      "reason": "The designed excursion has fully decayed 30 hours later.",
+      "anomalyScore": 0.0,
+      "healthScore": 100.0,
+      "state": "healthy",
+      "agreement": "match",
+      "terms": {
+        "latency": 0.0,
+        "loss": 0.0,
+        "jitter": 0.0,
+        "bandwidth": 0.0
+      },
+      "now": {
+        "t": 0.0,
+        "latencyMs": 21.3,
+        "lossPct": 0.02,
+        "jitterMs": 1.3,
+        "bandwidthPct": 65.8
+      },
+      "baseline": {
+        "latencyMs": 21.5,
+        "lossPct": 0.02,
+        "jitterMs": 1.3,
+        "bandwidthPct": 66
+      }
+    },
+    {
+      "profile": "bifurcation",
+      "linkId": "mumbai-delhi-core",
+      "linkName": "Mumbai–Delhi Core",
+      "designedBehaviour": "Flat until t=-6h, then a rising cascade across all four metrics.",
+      "resolvable": true,
+      "expectedState": "attention",
+      "reason": "Drift is designed to be underway at 'now' (ramp 25.9% progressed).",
+      "anomalyScore": 0.25,
+      "healthScore": 90.6,
+      "state": "attention",
+      "agreement": "match",
+      "terms": {
+        "latency": 0.396449704142012,
+        "loss": 0.22,
+        "jitter": 0.14999999999999997,
+        "bandwidth": 0.0
+      },
+      "now": {
+        "t": 0.0,
+        "latencyMs": 40.5,
+        "lossPct": 0.13,
+        "jitterMs": 1.2,
+        "bandwidthPct": 67.0
+      },
+      "baseline": {
+        "latencyMs": 33.8,
+        "lossPct": 0.02,
+        "jitterMs": 0.9,
+        "bandwidthPct": 62
+      }
+    },
+    {
+      "profile": "loss-degradation",
+      "linkId": "mumbai-pune-metro",
+      "linkName": "Mumbai–Pune Metro",
+      "designedBehaviour": "Packet loss and latency degrade from t=-20h.",
+      "resolvable": true,
+      "expectedState": "attention",
+      "reason": "Drift is designed to be underway at 'now' (ramp 68.4% progressed).",
+      "anomalyScore": 0.51,
+      "healthScore": 80.6,
+      "state": "attention",
+      "agreement": "match",
+      "terms": {
+        "latency": 0.5238095238095236,
+        "loss": 1.0,
+        "jitter": 0.0,
+        "bandwidth": 0.0
+      },
+      "now": {
+        "t": 0.0,
+        "latencyMs": 5.3,
+        "lossPct": 0.67,
+        "jitterMs": 0.4,
+        "bandwidthPct": 47.5
+      },
+      "baseline": {
+        "latencyMs": 4.2,
+        "lossPct": 0.02,
+        "jitterMs": 0.4,
+        "bandwidthPct": 44
+      }
+    },
+    {
+      "profile": "saturation",
+      "linkId": "delhi-bengaluru-core",
+      "linkName": "Delhi–Bengaluru Core",
+      "designedBehaviour": "Bandwidth, latency and jitter climb across the whole window.",
+      "resolvable": true,
+      "expectedState": "attention",
+      "reason": "Drift is designed to be well underway at 'now' (ramp 89.6% progressed).",
+      "anomalyScore": 0.44,
+      "healthScore": 83.2,
+      "state": "attention",
+      "agreement": "match",
+      "terms": {
+        "latency": 0.38538205980066426,
+        "loss": 0.0,
+        "jitter": 1.0,
+        "bandwidth": 0.9160000000000003
+      },
+      "now": {
+        "t": 0.0,
+        "latencyMs": 35.9,
+        "lossPct": 0.04,
+        "jitterMs": 4.0,
+        "bandwidthPct": 97.9
+      },
+      "baseline": {
+        "latencyMs": 30.1,
+        "lossPct": 0.04,
+        "jitterMs": 1.6,
+        "bandwidthPct": 71
+      }
+    },
+    {
+      "profile": "oscillation",
+      "linkId": "bengaluru-hyderabad-core",
+      "linkName": "Bengaluru–Hyderabad Core",
+      "designedBehaviour": "Intermittent instability: a 9h sine on jitter and latency with growing amplitude.",
+      "resolvable": false,
+      "expectedState": null,
+      "reason": "The designed property is intermittency over a window. The state at one instant depends on oscillation phase, so the design cannot assert one.",
+      "anomalyScore": 0.16,
+      "healthScore": 93.9,
+      "state": "healthy",
+      "agreement": "not-scored",
+      "terms": {
+        "latency": 0.3283582089552238,
+        "loss": 0.0,
+        "jitter": 0.2,
+        "bandwidth": 0.0
+      },
+      "now": {
+        "t": 0.0,
+        "latencyMs": 15.6,
+        "lossPct": 0.01,
+        "jitterMs": 1.3,
+        "bandwidthPct": 57.8
+      },
+      "baseline": {
+        "latencyMs": 13.4,
+        "lossPct": 0.01,
+        "jitterMs": 0.9,
+        "bandwidthPct": 58
+      },
+      "diagnostic": {
+        "window": "trailing 24h, samples with -24 < t <= 0",
+        "samples": 48,
+        "flaggedSamples": 0,
+        "fractionFlagged": 0.0,
+        "maxSingleSampleScore": 0.22,
+        "maxSingleSampleScoreUnrounded": 0.2169,
+        "thresholdMarginAtMax": 0.0031,
+        "scoreAtNow": 0.16,
+        "note": "Descriptive measurement of exposure, not a scoring method. It is not a rolling-window algorithm, is not used by the engine or the app, and has no pass/fail criterion."
+      }
+    }
+  ]
+}

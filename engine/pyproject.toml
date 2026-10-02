@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netsense-engine"
+version = "0.1.0"
+description = "Seeded synthetic telemetry, a rule-based anomaly scorer, and an evaluation harness for the NetSense prototype (rule-based, not machine learning)."
+requires-python = ">=3.10"
+dependencies = []  # standard library only
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["netsense*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "parity: cross-language checks against the TypeScript scorer (need Node and `npm install` in app/)",
+]

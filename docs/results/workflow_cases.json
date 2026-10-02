@@ -1,0 +1,383 @@
+{
+  "note": "Per-link output of the rule-based anomaly-to-incident workflow. 'origin' marks what is computed versus authored demonstration content.",
+  "overview": {
+    "networkBaselinePct": 91.4,
+    "activeSignals": 7,
+    "openIncidents": 5,
+    "corridorsFlagged": 4,
+    "corridorsTotal": 6
+  },
+  "seedNotes": [
+    "INC-391 has no originating prediction",
+    "PRD-101 is named as the originating prediction of INC-385, but PRD-101 has no forward link to INC-385",
+    "PRD-103 is named as the originating prediction of INC-388, but PRD-103 has no forward link to INC-388"
+  ],
+  "cases": [
+    {
+      "linkId": "mumbai-delhi-core",
+      "linkName": "Mumbai–Delhi Core",
+      "profile": "bifurcation",
+      "signal": {
+        "state": "attention",
+        "anomalyScore": 0.25,
+        "healthScore": 90.6,
+        "threshold": 0.22,
+        "terms": {
+          "latency": 0.396449704142012,
+          "loss": 0.22,
+          "jitter": 0.14999999999999997,
+          "bandwidth": 0.0
+        },
+        "contributions": {
+          "latency": 0.1585798816568048,
+          "loss": 0.066,
+          "jitter": 0.022499999999999996,
+          "bandwidth": 0.0
+        },
+        "dominantTerm": "latency",
+        "origin": "computed"
+      },
+      "predictions": [
+        {
+          "id": "PRD-104",
+          "status": "active",
+          "active": true,
+          "faultLabel": "Latency Instability",
+          "severity": "high",
+          "confidencePct": 91,
+          "relatedIncidentId": "INC-402",
+          "origin": "authored"
+        }
+      ],
+      "incidents": [
+        {
+          "id": "INC-402",
+          "status": "investigating",
+          "open": true,
+          "faultLabel": "RTT Excursion",
+          "severity": "critical",
+          "originatingPredictionId": "PRD-104",
+          "origin": "authored",
+          "engineerContext": {
+            "engineerId": "a-sharma",
+            "name": "A. Sharma",
+            "dutyStatus": "on-shift",
+            "city": "mumbai",
+            "specialisation": "Lead SRE Core",
+            "cityIsLinkEndpoint": true
+          }
+        }
+      ],
+      "displayStatus": "attention",
+      "displayStatusSource": "live-signal",
+      "flags": []
+    },
+    {
+      "linkId": "mumbai-pune-metro",
+      "linkName": "Mumbai–Pune Metro",
+      "profile": "loss-degradation",
+      "signal": {
+        "state": "attention",
+        "anomalyScore": 0.51,
+        "healthScore": 80.6,
+        "threshold": 0.22,
+        "terms": {
+          "latency": 0.5238095238095236,
+          "loss": 1.0,
+          "jitter": 0.0,
+          "bandwidth": 0.0
+        },
+        "contributions": {
+          "latency": 0.20952380952380945,
+          "loss": 0.3,
+          "jitter": 0.0,
+          "bandwidth": 0.0
+        },
+        "dominantTerm": "loss",
+        "origin": "computed"
+      },
+      "predictions": [
+        {
+          "id": "PRD-103",
+          "status": "active",
+          "active": true,
+          "faultLabel": "Packet Loss Degradation",
+          "severity": "high",
+          "confidencePct": 94,
+          "relatedIncidentId": null,
+          "origin": "authored"
+        }
+      ],
+      "incidents": [
+        {
+          "id": "INC-388",
+          "status": "mitigated",
+          "open": true,
+          "faultLabel": "Port CRC Errors",
+          "severity": "medium",
+          "originatingPredictionId": "PRD-103",
+          "origin": "authored",
+          "engineerContext": {
+            "engineerId": "p-kulkarni",
+            "name": "P. Kulkarni",
+            "dutyStatus": "on-shift",
+            "city": "pune",
+            "specialisation": "Edge Optical Engineer",
+            "cityIsLinkEndpoint": true
+          }
+        }
+      ],
+      "displayStatus": "attention",
+      "displayStatusSource": "live-signal",
+      "flags": []
+    },
+    {
+      "linkId": "delhi-bengaluru-core",
+      "linkName": "Delhi–Bengaluru Core",
+      "profile": "saturation",
+      "signal": {
+        "state": "attention",
+        "anomalyScore": 0.44,
+        "healthScore": 83.2,
+        "threshold": 0.22,
+        "terms": {
+          "latency": 0.38538205980066426,
+          "loss": 0.0,
+          "jitter": 1.0,
+          "bandwidth": 0.9160000000000003
+        },
+        "contributions": {
+          "latency": 0.15415282392026572,
+          "loss": 0.0,
+          "jitter": 0.15,
+          "bandwidth": 0.13740000000000002
+        },
+        "dominantTerm": "latency",
+        "origin": "computed"
+      },
+      "predictions": [
+        {
+          "id": "PRD-102",
+          "status": "investigating",
+          "active": true,
+          "faultLabel": "Bandwidth Saturation",
+          "severity": "medium",
+          "confidencePct": 87,
+          "relatedIncidentId": "INC-398",
+          "origin": "authored"
+        }
+      ],
+      "incidents": [
+        {
+          "id": "INC-398",
+          "status": "investigating",
+          "open": true,
+          "faultLabel": "Bandwidth Saturation",
+          "severity": "high",
+          "originatingPredictionId": "PRD-102",
+          "origin": "authored",
+          "engineerContext": {
+            "engineerId": "v-nair",
+            "name": "V. Nair",
+            "dutyStatus": "on-shift",
+            "city": "bengaluru",
+            "specialisation": "NetOps Principal",
+            "cityIsLinkEndpoint": true
+          }
+        }
+      ],
+      "displayStatus": "attention",
+      "displayStatusSource": "live-signal",
+      "flags": []
+    },
+    {
+      "linkId": "bengaluru-chennai-core",
+      "linkName": "Bengaluru–Chennai Core",
+      "profile": "stable",
+      "signal": {
+        "state": "healthy",
+        "anomalyScore": 0.0,
+        "healthScore": 100.0,
+        "threshold": 0.22,
+        "terms": {
+          "latency": 0.0,
+          "loss": 0.0,
+          "jitter": 0.0,
+          "bandwidth": 0.0
+        },
+        "contributions": {
+          "latency": 0.0,
+          "loss": 0.0,
+          "jitter": 0.0,
+          "bandwidth": 0.0
+        },
+        "dominantTerm": null,
+        "origin": "computed"
+      },
+      "predictions": [
+        {
+          "id": "PRD-101",
+          "status": "monitored",
+          "active": false,
+          "faultLabel": "Jitter Spike",
+          "severity": "low",
+          "confidencePct": 78,
+          "relatedIncidentId": null,
+          "origin": "authored"
+        },
+        {
+          "id": "PRD-105",
+          "status": "monitored",
+          "active": false,
+          "faultLabel": "Optical Amplifier Drift",
+          "severity": "low",
+          "confidencePct": 72,
+          "relatedIncidentId": null,
+          "origin": "authored"
+        }
+      ],
+      "incidents": [
+        {
+          "id": "INC-385",
+          "status": "resolved",
+          "open": false,
+          "faultLabel": "Optical Packet Drop",
+          "severity": "medium",
+          "originatingPredictionId": "PRD-101",
+          "origin": "authored",
+          "engineerContext": {
+            "engineerId": "m-bose",
+            "name": "M. Bose",
+            "dutyStatus": "on-shift",
+            "city": "bengaluru",
+            "specialisation": "Optical Systems Engineer",
+            "cityIsLinkEndpoint": true
+          }
+        }
+      ],
+      "displayStatus": "healthy",
+      "displayStatusSource": "none",
+      "flags": []
+    },
+    {
+      "linkId": "bengaluru-hyderabad-core",
+      "linkName": "Bengaluru–Hyderabad Core",
+      "profile": "oscillation",
+      "signal": {
+        "state": "healthy",
+        "anomalyScore": 0.16,
+        "healthScore": 93.9,
+        "threshold": 0.22,
+        "terms": {
+          "latency": 0.3283582089552238,
+          "loss": 0.0,
+          "jitter": 0.2,
+          "bandwidth": 0.0
+        },
+        "contributions": {
+          "latency": 0.13134328358208952,
+          "loss": 0.0,
+          "jitter": 0.03,
+          "bandwidth": 0.0
+        },
+        "dominantTerm": "latency",
+        "origin": "computed"
+      },
+      "predictions": [
+        {
+          "id": "PRD-100",
+          "status": "investigating",
+          "active": true,
+          "faultLabel": "Link Health Degradation",
+          "severity": "medium",
+          "confidencePct": 83,
+          "relatedIncidentId": "INC-395",
+          "origin": "authored"
+        }
+      ],
+      "incidents": [
+        {
+          "id": "INC-395",
+          "status": "investigating",
+          "open": true,
+          "faultLabel": "BGP Peer Dampening",
+          "severity": "high",
+          "originatingPredictionId": "PRD-100",
+          "origin": "authored",
+          "engineerContext": {
+            "engineerId": "s-reddy",
+            "name": "S. Reddy",
+            "dutyStatus": "on-shift",
+            "city": "hyderabad",
+            "specialisation": "Network Reliability Eng",
+            "cityIsLinkEndpoint": true
+          }
+        }
+      ],
+      "displayStatus": "attention",
+      "displayStatusSource": "authored-severity",
+      "flags": [
+        "authored_severity_without_live_signal"
+      ]
+    },
+    {
+      "linkId": "chennai-pune-core",
+      "linkName": "Chennai–Pune Core",
+      "profile": "recovering",
+      "signal": {
+        "state": "healthy",
+        "anomalyScore": 0.0,
+        "healthScore": 100.0,
+        "threshold": 0.22,
+        "terms": {
+          "latency": 0.0,
+          "loss": 0.0,
+          "jitter": 0.0,
+          "bandwidth": 0.0
+        },
+        "contributions": {
+          "latency": 0.0,
+          "loss": 0.0,
+          "jitter": 0.0,
+          "bandwidth": 0.0
+        },
+        "dominantTerm": null,
+        "origin": "computed"
+      },
+      "predictions": [
+        {
+          "id": "PRD-099",
+          "status": "monitored",
+          "active": false,
+          "faultLabel": "Latency Instability",
+          "severity": "medium",
+          "confidencePct": 81,
+          "relatedIncidentId": null,
+          "origin": "authored"
+        }
+      ],
+      "incidents": [
+        {
+          "id": "INC-391",
+          "status": "mitigated",
+          "open": true,
+          "faultLabel": "Optical Attenuation Drift",
+          "severity": "medium",
+          "originatingPredictionId": null,
+          "origin": "authored",
+          "engineerContext": {
+            "engineerId": "r-iyer",
+            "name": "R. Iyer",
+            "dutyStatus": "on-shift",
+            "city": "chennai",
+            "specialisation": "Infrastructure Eng",
+            "cityIsLinkEndpoint": true
+          }
+        }
+      ],
+      "displayStatus": "healthy",
+      "displayStatusSource": "none",
+      "flags": []
+    }
+  ]
+}

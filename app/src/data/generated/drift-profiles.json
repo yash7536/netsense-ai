@@ -1,0 +1,8 @@
+{
+  "bengaluru-chennai-core": "stable",
+  "chennai-pune-core": "recovering",
+  "mumbai-delhi-core": "bifurcation",
+  "mumbai-pune-metro": "loss-degradation",
+  "delhi-bengaluru-core": "saturation",
+  "bengaluru-hyderabad-core": "oscillation"
+}
